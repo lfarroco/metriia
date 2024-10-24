@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  backend:
+    image: python:3
+    container_name: python-backend
+    working_dir: /usr/src/app
+    command: make build
+    volumes:
+      - ./backend:/usr/src/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/mydatabase
+
+  db:
+    image: postgres:14
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydatabase
+    volumes:
+      - metriia-data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql # Initial SQL script
+    ports:
+      - "5400:5432"
+
+  frontend:
+    image: node:23
+    container_name: react-frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true # For hot-reloading in Docker
+    working_dir: /app
+    command: npm start
+
+volumes:
+  metriia-data:
