@@ -3,10 +3,14 @@ dev:
 	python ./src/manage.py migrate
 	python ./src/manage.py runserver 0.0.0.0:8000
 
-makemigrations:
+migrations:
 	python ./src/manage.py makemigrations
 
-migrate
+migrate:
+	python ./src/manage.py migrate
+
+flush:
+	rm -rf ./src/db.sqlite3
 	python ./src/manage.py migrate
 
 shell:
@@ -14,3 +18,8 @@ shell:
 
 freeze:
 	pip freeze > requirements.txt
+
+ingest:
+	python ./src/manage.py ingest cs.SE
+	python ./src/manage.py calc_embeddings
+	python ./src/manage.py calc_embeddings_distance
